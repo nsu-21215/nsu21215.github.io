@@ -45,11 +45,23 @@
     <div class="coin" id="clickCoin">J</div>
 
     <script>
+        const serverUrl = "https://90f5941b-771d-40bb-98d8-00338ccd9b1a-00-1k876osxiw7ld.worf.replit.dev";
         const userId = new URLSearchParams(window.location.search).get("user_id");
+
         let balance = 0;
-        
+
+        function updateBalance() {
+            fetch(`${serverUrl}/balance/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    balance = data.balance;
+                    document.getElementById("balance").textContent = balance;
+                })
+                .catch(error => console.error("Ошибка:", error));
+        }
+
         document.getElementById("clickCoin").addEventListener("click", () => {
-            fetch(`/click/${userId}`, { method: "POST" })
+            fetch(`${serverUrl}/click/${userId}`, { method: "POST" })
                 .then(response => response.json())
                 .then(data => {
                     balance++;
@@ -57,6 +69,9 @@
                 })
                 .catch(error => console.error("Ошибка:", error));
         });
+
+        // Загружаем текущий баланс при открытии страницы
+        updateBalance();
     </script>
 </body>
 </html>
