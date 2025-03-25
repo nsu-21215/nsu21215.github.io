@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J Coin Clicker</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .coin {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #ffa500, #ff8c00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin: 50px auto;
+            cursor: pointer;
+            transition: transform 0.1s ease-in-out;
+        }
+        .coin:active {
+            transform: scale(0.9);
+        }
+        .balance {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Кликай на J Coin!</h1>
+    <div class="balance">Баланс: <span id="balance">0</span> J</div>
+    <div class="coin" id="clickCoin">J</div>
+
+    <script>
+        const userId = new URLSearchParams(window.location.search).get("user_id");
+        let balance = 0;
+        
+        document.getElementById("clickCoin").addEventListener("click", () => {
+            fetch(`/click/${userId}`, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    balance++;
+                    document.getElementById("balance").textContent = balance;
+                })
+                .catch(error => console.error("Ошибка:", error));
+        });
+    </script>
+</body>
+</html>
