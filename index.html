@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J Coin Clicker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            margin-top: 20px;
-        }
+        body { text-align: center; font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        h1 { margin-top: 20px; }
         .coin {
             width: 150px;
             height: 150px;
@@ -30,13 +25,8 @@
             cursor: pointer;
             transition: transform 0.1s ease-in-out;
         }
-        .coin:active {
-            transform: scale(0.9);
-        }
-        .balance {
-            font-size: 20px;
-            margin-top: 10px;
-        }
+        .coin:active { transform: scale(0.9); }
+        .balance { font-size: 20px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -46,31 +36,43 @@
 
     <script>
         const serverUrl = "https://90f5941b-771d-40bb-98d8-00338ccd9b1a-00-1k876osxiw7ld.worf.replit.dev";
-        const userId = new URLSearchParams(window.location.search).get("user_id");
 
-        let balance = 0;
+        // Получаем данные пользователя из Telegram Web App API
+        const tg = window.Telegram.WebApp;
+        const user = tg.initDataUnsafe.user;
+
+        if (!user) {
+            alert("Ошибка авторизации!");
+            throw new Error("Пользователь не авторизован");
+        }
+
+        const userId = user.id;
+        const authData = tg.initData; // Передаём это на сервер для проверки
 
         function updateBalance() {
-            fetch(`${serverUrl}/balance/${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    balance = data.balance;
-                    document.getElementById("balance").textContent = balance;
-                })
-                .catch(error => console.error("Ошибка:", error));
+            fetch(`${serverUrl}/balance/${userId}`, { 
+                method: "GET",
+                headers: { "X-Telegram-Auth": authData }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("balance").textContent = data.balance;
+            })
+            .catch(error => console.error("Ошибка:", error));
         }
 
         document.getElementById("clickCoin").addEventListener("click", () => {
-            fetch(`${serverUrl}/click/${userId}`, { method: "POST" })
-                .then(response => response.json())
-                .then(data => {
-                    balance++;
-                    document.getElementById("balance").textContent = balance;
-                })
-                .catch(error => console.error("Ошибка:", error));
+            fetch(`${serverUrl}/click/${userId}`, { 
+                method: "POST",
+                headers: { "X-Telegram-Auth": authData }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("balance").textContent = data.balance;
+            })
+            .catch(error => console.error("Ошибка:", error));
         });
 
-        // Загружаем текущий баланс при открытии страницы
         updateBalance();
     </script>
 </body>
